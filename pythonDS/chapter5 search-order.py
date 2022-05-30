@@ -140,34 +140,69 @@ class Hashtable:
         return self.put(key,value)
 
 
-# class Hashtable:
-#     def __init__(self, size):
-#         self.size = size
-#         self.slots = self.size * [None]
-#         self.data = self.size * [None]
 
 
+
+'''
+bubble sort， n-1 round, each round will iterate the number of comparison in the last round -1 
+the first round: compare n-1 times. since only if n-1 has been comparison, the last one can be known ordered
+
+time complexity: O(N^2)
+
+'''
+
+
+def bubble_sort(alist):
+    for compare in range(len(alist)-1,0,-1):  # first round:n-1, second round: n-2, ........
+        print('outer loop '+str(compare))
+        for num in range(compare):
+            # the maximum index would be less than 1 of elements in the round to avoid the out of index
+            print(num)
+            if alist[num]> alist[num+1]:
+                alist[num],alist[num+1]= alist[num+1], alist[num]
+
+    print(alist)
+
+'''
+optimzied bubble sort, instead of comparing between the current one and the next one\
+, it just select the maximum one, and exchange this one with the last one, and compare n-1 rounds
+
+O(N^2)
+'''
+def selection_sort(alist):
+    for compare in range(len(alist)-1,0,-1):  # first round:n-1, second round: n-2, ........
+        print('outer loop '+str(compare))
+        maxnum=compare
+        for num in range(compare):
+            # the maximum index would be less than 1 of elements in the round to avoid the out of index
+            print(num)
+            if alist[num]> alist[maxnum]:
+                maxnum=num
+        alist[compare],alist[maxnum]=alist[maxnum], alist[compare]
+
+    print(alist)
 if __name__=='__main__':
+    selection_sort([1,5,2,3,3,9,7])
     # testlist = [0, 1 ]
     # print(binary_search_rec(testlist, 0))
     # print(binary_search_rec(testlist, 13))
     # print(1//2)
 
-    H = Hashtable(11)
-    H[54] = 'cat'
-    H[26] = 'DOG'
-    H[93] = 'LION'
-    H[17] = 'TIGER'
-    H[77] = 'BIRD'
-    H[31] = 'COW'
-    H[44] = 'GOAT'
-    H[55] = 'PIG'
-    H[20] = 'CHICKEN'
-    print(H.slots)
-    print(H.data)
-    print(H[20])
-    print(H[17])
-    H[20] = 'DUCK'
-    print(H[20])
+    # H = Hashtable(11)
+    # H[54] = 'cat'
+    # H[26] = 'DOG'
+    # H[93] = 'LION'
+    # H[17] = 'TIGER'
+    # H[77] = 'BIRD'
+    # H[31] = 'COW'
+    # H[44] = 'GOAT'
+    # H[55] = 'PIG'
+    # H[20] = 'CHICKEN'
+    # print(H.slots)
+    # print(H.data)
+    # print(H[20])
+    # print(H[17])
+    # H[20] = 'DUCK'
+    # print(H[20])
     # print(H.data)
     # print(sequential_search([1,2,5,7,9],2))
