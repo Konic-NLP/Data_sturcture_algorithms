@@ -159,9 +159,33 @@ def bubble_sort(alist):
             # the maximum index would be less than 1 of elements in the round to avoid the out of index
             print(num)
             if alist[num]> alist[num+1]:
+                # each element in the alist must compare with the next element until the next to last element
                 alist[num],alist[num+1]= alist[num+1], alist[num]
 
     print(alist)
+
+    
+    
+def short_bubble_sort(alist):
+    round= len(alist)-1
+    stop = False
+    while round >0 and not stop:
+        
+                      # first round:n-1, second round: n-2, ........
+        print('outer loop '+str(compare))
+        stop = True # presupposed each round set there no need to compare anymore, and terminate the outer loop
+        for num in range(compare):
+            # the maximum index would be less than 1 of elements in the round to avoid the out of index
+            print(num)
+            if alist[num]> alist[num+1]:
+                # each element in the alist must compare with the next element until the next to last element
+                alist[num],alist[num+1]= alist[num+1], alist[num]
+                stop = False # once exchange happens, it means that we need comparison
+        round-=1
+
+    print(alist)
+  
+    
 
 '''
 optimzied bubble sort, instead of comparing between the current one and the next one\
@@ -173,13 +197,17 @@ def selection_sort(alist):
     for compare in range(len(alist)-1,0,-1):  # first round:n-1, second round: n-2, ........
         print('outer loop '+str(compare))
         maxnum=compare
-        for num in range(compare):
+        for num in range(compare):  # get from the first to the next to last element, and compare with the last one.
             # the maximum index would be less than 1 of elements in the round to avoid the out of index
             print(num)
             if alist[num]> alist[maxnum]:
                 maxnum=num
         alist[compare],alist[maxnum]=alist[maxnum], alist[compare]
-
+#         maxvalue=0   # get from the second one to the last one, and compare with the first one at the begining. 
+#         for num in range(1, compare+1):   # can start from the second element and compare with the first one at the begining
+#             if alist[num]>alist[maxvalue]:
+#                 maxvalue = num
+#         alist[maxvalue], alist[compare] = alist[compare], alist[maxvalue]  # exchange the maxindex with the last element within the current round.
     print(alist)
 
 
