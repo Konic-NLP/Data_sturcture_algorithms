@@ -307,8 +307,35 @@ def checker(s):
 
 
 '''
+def isPalindrome(x):
+    x=str(x)
+    return x== x[::-1]
+
+
 
 # 方法3， 只将一半进行翻转，应该和前边一个完全一样即  abcba ba[::-1]==ab
+def isPalindrome(x):
+    x=str(x)
+    half=len(x)//2
+    return x[:half]==x[-1:half-1:-1]
+
+
+# method 4. not convert the number to the string. just using the number order
+# 123= （(1*10)*10+2）*10+3
+
+def isPalindrome(x):
+    # negative number or end with 0(except 0) cannot be a palindrome.
+    if x <0 or (x%10==0 and x!=0):
+        return False
+    reverted=0
+    while x>reverted:
+        # even number of x, when number of x==number of reverted, stop;
+        # odd number of x, when number of x< reverted,stop the loop
+        reverted=x%10+reverted*10
+        x=x//10
+
+    return reverted == x or reverted//10 == x   # == for even number of x, //10 for odd number of x. like 123 and 12
+
 '''
 ==================================================================================================
 '''
