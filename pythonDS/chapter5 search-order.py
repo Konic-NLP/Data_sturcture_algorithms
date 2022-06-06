@@ -181,6 +181,41 @@ def selection_sort(alist):
         alist[compare],alist[maxnum]=alist[maxnum], alist[compare]
 
     print(alist)
+
+
+# another implementation
+
+def select_sort(arr):
+    for i in range(len(arr) - 1):
+        remain = arr[i + 1:len(arr)]
+        count = i + remain.index(min(remain)) + 1
+        if arr[count] < arr[i]:
+            arr[i], arr[count] = arr[count], arr[i]
+
+    return arr
+
+    '''
+    insert sort,
+    any elements before the current that wait for sorting is ordered, the elements just iterate all the elements,
+    if the current element is less than the compared element, then swap the element, else, the current position is the 
+    current elemnt should be 
+    '''
+
+
+    '''
+    shell sort, the optimized edition of the insert sort, first, split the elements into several subgroup based on the step
+    then execute the insert sort within each sub group, and in the end, just execute one round insert sort.
+    Since some elements has been ordered within the subgroup, so the overall efficient is better than the insert sort
+    '''
+
+
+
+    '''
+    quick sort,
+    just select one element as the base, all the element that less than the base would be on the left and all element greater
+    than the element on the right, and rucursive  
+    
+    '''
 if __name__=='__main__':
     selection_sort([1,5,2,3,3,9,7])
     # testlist = [0, 1 ]
