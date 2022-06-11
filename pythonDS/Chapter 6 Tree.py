@@ -5,6 +5,104 @@ heap, binary_search_tree, AVL etc.
 '''
 
 
+# implement a binary tree with list
+def binarytree(node):
+    return [node,[],[]]
+def insertleft(tree,node):
+    l=tree.pop(1)
+    if len(l)>1:
+        tree.insert(1,[node,l,[]])
+    else:
+        tree.insert([node,[],[]])
+    return tree
+
+
+def insertright(tree,node):
+    r=tree.pop(2)
+    if len(r)>1:
+        tree.insert(2,[node,[],r])
+    else:
+        tree.insert(2,[node,[],[]])
+def getleftchild(tree):
+    return tree[1]
+def getrightchild(tree):
+    return tree[2]
+def getrooteval(tree):
+    return tree[0]
+def setrooteval(tree,node):
+    tree[0]=node
+
+
+'''
+use reference and class to implement a binary tree
+'''
+class BinaryTree:
+    def __init__(self,val):
+        self.root=val
+        self.leftchild=None
+        self.rightchild=None
+    def insertliftchild(self,leftchild):
+        l=BinaryTree(leftchild)
+
+        if self.leftchild is None:
+            self.leftchild=l
+        else:
+            # notice the order
+            l.leftchild=self.leftchild
+            self.leftchild=l
+    def insertrightchild(self,rightchild):
+        if self.rightchild is None:
+            r=BinaryTree(rightchild)
+            self.rightchild=r
+        else:
+            r=BinaryTree(rightchild)
+            r.rightchild=self.rightchild
+            self.rightchild=r
+    def getrightchild(self):
+        return  self.rightchild
+    def getleftchild(self):
+        return self.leftchild
+    def seteval(self,val):
+        self.root=val
+    def geteval(self):
+        return self.root
+
+'''
+parse tree to express a math expression with a tree
+(: add a leftchild, and set the leftchild as the current node
+numbers: set the node as the numbers. return to the parent node
+operator: set the node as the operator, insert the right node and set the right node as the current node
+): return to the parent node.
+how to store the parent node: stack
+'''
+
+def binaryparsetree(exp):
+    fplist=exp.split()
+    pstack=[]
+    tree=BinaryTree('') # set a default parent tree
+    pstack.append(tree)  # first, need to push the root node into the parent node stack
+    cur=tree
+    for i in fplist:
+        if i =='(':
+            cur.insertliftchild('')
+            pstack.append(cur)
+            cur=cur.getleftchild()
+        elif i not in '+-*/)':
+            cur.seteval(eval(i))
+            cur=pstack.pop()
+        elif i in '+-*/':
+            cur.seteval(i)
+            cur.insertrightchild('')
+            pstack.append(cur)
+            cur=cur.getrightchild()
+        elif i==')':
+            cur=pstack.pop()
+        else:
+            raise ValueError('no such an operator'+ i)
+    return tree
+
+
+
 
 '''
 Binary Heap
@@ -118,3 +216,7 @@ def postorder(tree):
         postorder(tree.leftchild)
         postorder(tree.rightchild)
         print(tree.val)
+
+
+
+
