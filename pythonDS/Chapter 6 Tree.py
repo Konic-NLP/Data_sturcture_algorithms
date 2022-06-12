@@ -155,7 +155,71 @@ class BinarySearchTree:
         return self.size
     def __iter__(self):
         return self.root.__iter__()
+    def put(self,key,val):
+        if self.root:
+            self._put(key,val,self.root)
+        else:
+            self.root=Treenode(key,val)
+        self.size+=1
+    # helper function
+    def _put(self,key,val,current):
+        if key <current.key:
+            if current.hasleftchild():
+                self._put(key,val,current.leftchild)
+            else:
+                current.leftchild=Treenode(key,val,parent=current)
+        else:
+            if current.hasrightchild():
+                self._put(key,val,current.rightchild)
+            else:
+                current.rightchild=Treenode(key,val,parent=current)
+    def __setitem__(self, key, value):
+        self.put(key,value)
+    def get(self,key):
+        if self.root:
+            res=self._get(key,self.root)
+            if res:
+                return res.value
+            else:
+                return None
+        else:
+            return None
+    def _get(self,key,current):
+        if not current:
+            return None
+        elif current.key==key:
+            return current
+        elif key< current.key:
+            return self._get(key,current.leftchild)
+        else:
+            return self._get(key,current.rightchild)
+    def __getitem__(self, item):
+        self.get(item)
+    def __contains__(self, item):
+        if self._get(item,self.root):
+            return True
+        else:
+            return False
 
+
+    '''
+    delete a key, first, locate the key
+    '''
+    def delete(self,key):
+        if self.size>1:
+            node2remove= self._get(key,self.root)
+            if node2remove:
+                self.remove(node2remove)
+                self.size-=1  # don't forget change the size of the binary search tree
+            else:
+                raise KeyError('key not in the tree')
+        elif self.size==1 and self.root.ket==key:
+            self.root=None
+            self.size=0
+        else:
+            raise KeyError('key not in the tree')
+    def __delitem__(self, key):
+        self.delete(key)
 
 class Treenode:
     # the parameter for the constructor, the key, value pair(for dict), the left child, the right child, and the parent child
