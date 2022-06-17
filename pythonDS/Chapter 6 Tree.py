@@ -6,6 +6,9 @@ heap, binary_search_tree, AVL etc.
 
 
 # implement a binary tree with list
+import operator
+
+
 def binarytree(node):
     return [node,[],[]]
 def insertleft(tree,node):
@@ -66,7 +69,13 @@ class BinaryTree:
         self.root=val
     def geteval(self):
         return self.root
-
+    def preorder(self):
+        print(self.root)
+        # when the recurrsive, should call the method of the child node itself
+        if self.leftchild:
+            self.leftchild.preorder()
+        if self.rightchild:
+            self.rightchild.preorder()
 '''
 parse tree to express a math expression with a tree
 (: add a leftchild, and set the leftchild as the current node
@@ -102,7 +111,20 @@ def binaryparsetree(exp):
     return tree
 
 
-
+# compute the result of the binary Tree via recurrsion
+def evaluate(parsetree):
+    # def a dict for mapping the operator to the function
+    op={'*':operator.mul,'/':operator.truediv,'+':operator.add,'-':operator.sub
+    }
+    left=parsetree.getleftchild()
+    right= parsetree.getrightchild()
+    if left and right:
+        # the sub tree who has right and left, the root must be an operator
+        fn=op[parsetree.geteval()]
+        return fn(evaluate(left),evaluate(right))
+    else:
+        # leaf node has to be a number
+        return parsetree.geteval()
 
 '''
 Binary Heap
@@ -220,6 +242,21 @@ class BinarySearchTree:
             raise KeyError('key not in the tree')
     def __delitem__(self, key):
         self.delete(key)
+    '''
+    three possibility for deleting a node from a binary search tree:
+    1. the deleting node has no child nodes
+    2. the deleting node has one child nodes
+    3.the deleting node has two child nodes.
+    '''
+    #possible 1  the deleting node is a leaf node, just set its parent node's corresponding node as None
+    if current.isleaf():  # jutisfy if it is a leaf node
+        if current==curent.parent.leftchild:  # see if it is a leftchild of the parent node or rightchild
+            current.parent.leftchild=None
+        else:
+            current.parent.rightchild=None
+
+
+
 
 class Treenode:
     # the parameter for the constructor, the key, value pair(for dict), the left child, the right child, and the parent child
@@ -274,6 +311,15 @@ def inorder(tree):
         inorder(tree.leftchild)
         print(tree.val)
         inorder(tree.rightchild)
+# print the expression using in order
+def printexp(tree):
+    ans=''
+    if tree:
+        ans='('+printexp(tree.getleftchild())
+        ans+=str(tree.geteval())
+        ans=ans+printexp(tree.getrightchild())+')'
+    return ans
+
 
 def postorder(tree):
     if tree:
@@ -281,6 +327,15 @@ def postorder(tree):
         postorder(tree.rightchild)
         print(tree.val)
 
-
+# postorder to get the result of computation
+def postordereval(tree):
+    op = {'*': operator.mul, '/': operator.truediv, '+': operator.add, '-': operator.sub}
+    if tree:
+        left=postordereval(tree.leftchild)
+        right=postordereval(tree.right)
+        if left and right:
+            return op[tree.geteval()](left,right)
+        else:
+            return tree.geteval()
 
 
