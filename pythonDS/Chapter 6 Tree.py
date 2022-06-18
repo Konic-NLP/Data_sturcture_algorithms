@@ -167,6 +167,101 @@ the property of bisect search: left child less than the parent node and the righ
 parent node.
 
 '''
+class Treenode:
+    # the parameter for the constructor, the key, value pair(for dict), the left child, the right child, and the parent child
+    def __init__(self, key, value, left=None, right=None, parent=None):
+        self.key=key
+        self.value=value
+        self.leftchild=left
+        self.rightchild=right
+        self.parent=parent
+    def hasleftchild(self):
+        return self.leftchild
+    def hasrightchild(self):
+        return self.rightchild
+
+    def isleftchild(self):
+        return self.parent and self.parent.leftchild==self
+    def isrightchild(self):
+        return self.parent and self.parent.rightchild==self
+
+    def isroot(self):
+        # root node doesn't has a parent node
+        return not self.parent
+    def isleaf(self):
+        # the leafnode doesn't has any child node
+        return not self.leftchild and not self.rightchild
+    def hasanychild(self):
+        return self.rightchild or self.leftchild
+    def hasbothchild(self):
+        return self.rightchild&self.leftchild
+    def repalcenode(self,key,value,lc,rc):
+        self.key=key
+        self.value=value
+        self.leftchild=lc
+        self.rightchild=rc
+        # since it store the parent node information, so when the child node information changed, the parent information
+        # of the child node should also be updated
+        if self.hasleftchild():
+            self.leftchild.parent=self
+        if self.hasrightchild():
+            self.rightchild.parent=self
+
+    def findsuccessor(self):
+        '''
+        the node that follow the current node with inorder
+        if the node has rightchild, the successor is the minimum node of the right child subtree.
+        else: if this is the leftchild of the parent node, the successor is the parent node
+        else: the current node is the right child of the parent and has no right child, the successor is the successor of the parent node exclude itself
+
+        '''
+        succ = None
+        if self.hasrightchild():
+            succ = self.rightchild().findmin()
+        else:
+            if self.parent:
+                if self.isleftchid():
+                    succ = self.parent
+                else:
+                    self.parent.rightchild = None  # set itself as none so that the parent find successor not include itself
+                    succ = self.parent.findsuccessor()  # recursive
+                    self.parent.rightchild = self
+        return succ
+
+    def findmin(self):
+        current = self  # find out the leftest child: the child don't have a left child
+        while current.hasleftchild():
+            current = current.leftchild
+        return current
+    def spliceof(self):# delete the current node
+        if self.isleaf():
+            if self.isleftchild():
+                self.parent.leftchild=None
+            else:
+                self.parent.rightchild=None
+        elif self.hasanychild():
+            if self.hasleftchild():
+                if self.isleftchild():
+                    self.parent.leftchild=self.leftchild
+                else:
+                    self.parent.rightchild=self.leftchild
+                self.leftchild.parent=self.parent
+            else:
+                if self.isleftchild():
+                    self.parent.leftchild=self.rightchild
+                else:
+                    self.parent.rightchild=self.rightchild
+                self.rightchild.parent=self.parent
+    def __iter__(self): # iterate each node of the tree  by recurrsion and generator
+        '''inorder to traverse the whhole tree with the yeild'''
+        if self:
+            if self.hasleftchild():
+                for each in self.leftchild():
+                    yield each
+            yield self.key
+            if self.hasrightchild():
+                for each in self.rightchild():
+                    yield each
 
 class BinarySearchTree:
     def __init__(self):
@@ -255,132 +350,89 @@ class BinarySearchTree:
     2. the deleting node has one child nodes
     3.the deleting node has two child nodes.
     '''
-    def remove(self):
+    def remove(self,currentnode:Treenode):
     #possible 1  the deleting node is a leaf node, just set its parent node's corresponding node as None
-        if current.isleaf():  # jutisfy if it is a leaf node
-            if current==curent.parent.leftchild:  # see if it is a leftchild of the parent node or rightchild
-                current.parent.leftchild=None
+        if currentnode.isleaf():  # jutisfy if it is a leaf node
+            if currentnode.isleftchild():  # see if it is a leftchild of the parent node or rightchild
+                currentnode.parent.leftchild=None
             else:
-                current.parent.rightchild=None
+                currentnode.parent.rightchild=None
     # possibility 2 the deleting node has one node, just judge that node is a left node or a right node
     # since the one node has a parent and the child, it need to adjust after deletion
     # the node can be the right child or left child of the parent, and the node can have left or right child, and the
     #node can be root node(without parent node)
 
-    else:
+        elif currentnode.hasbothchild():
+        # possible 3 the node has two nodes, and find out the proceeding node to replace the deleting node
+            succ = currentnode.findsuccessor()  # find out the successor
+            succ.spliceout()  # delete the successor
+            currentnode.key = succ.key
+            currentnode.val = succ.val  # substitute the deleting node
+        else: #just one child
     # no matter what the right child or left child the current node is, all its subtree must bigger or less than the parent node
-    if currentnode.hasleftchild():
-        if currentnode.isleftchild():
-            currentnode.leftchild.parent=currentnode.parent
-            currentnode.parent.leftchild=currentnode.leftchild
-        elif:
-            currentnode.leftchild.parent = currentnode.parent
-            currentnode.parent.rightchild= currentnode.leftchild
-        else: #the current node is the root so that it has no parent node
-            currentnode.replacedata(currentnode.leftchild.key,currentnode.leftchild.val,currentnode.leftchild.leftchild,currentnode.leftchild.rightchild)
-    else:
-        # if the current node has only one node and that node is right node
-
-
-    # possible 3 the node has two nodes, and find out the proceeding node to replace the deleting node
-    elif currentnode.hasbothchild():
-    succ=currentnode.findsuccessor()  # find out the successor
-    succ.spliceout()                     # delete the successor
-
-    currentnode.key=succ,key
-    currentnode.val=succ.val   # substitute the deleting node
-
-
+            if currentnode.hasleftchild():
+                if currentnode.isleftchild():
+                    currentnode.leftchild.parent=currentnode.parent
+                    currentnode.parent.leftchild=currentnode.leftchild
+                elif currentnode.isrightchild():
+                    currentnode.leftchild.parent = currentnode.parent
+                    currentnode.parent.rightchild= currentnode.leftchild
+                else: #the current node is the root so that it has no parent node
+                    currentnode.repalcenode(currentnode.leftchild.key,currentnode.leftchild.val,currentnode.leftchild.leftchild,currentnode.leftchild.rightchild)
+            else:# if the current node has only one node and that node is right node
+                if currentnode.isleftchild():
+                    currentnode.parent.leftchild=currentnode.rightchild
+                    currentnode.rightchild.parent=currentnode.parent
+                elif currentnode.isrightchild():
+                    currentnode.rightchild.parent=currentnode.parent
+                    currentnode.parent.rightchild=currentnode.rightchild
+                else:
+                    currentnode.repalcenode(currentnode.rightchild.key,currentnode.rightchild.val,currentnode.rightchild.leftchild,
+                                            currentnode.rightchild.rightchild)
 
 
 
 
+'''blanced binary search tree  AVL tree'''
+'''balanced factor: the difference between the height of the left child and the height of the right child'''
+#if balanced factor >0 left incline, else: right incline  O(logn)
+class AVL(BinarySearchTree):# inherited from binary search tree and overriden the _put method here.
+    def _put(self,key,val,current):
+        if key<current.key:
+            if current.hasleftchild():
+                self._put(key,val,current.leftchild)
+            else:
+                current.leftchild=Treenode(key,val,parent=current)
+                self.updatebalance(current.leftchild)
 
-class Treenode:
-    # the parameter for the constructor, the key, value pair(for dict), the left child, the right child, and the parent child
-    def __init__(self, key, value, left=None, right=None, parent=None):
-        self.key=key
-        self.value=value
-        self.leftchild=left
-        self.rightchild=right
-        self.parent=parent
-    def hasleftchild(self):
-        return self.leftchild
-    def hasrightchild(self):
-        return self.rightchild
-
-    def isleftchild(self):
-        return self.parent and self.parent.leftchild==self
-    def isrightchild(self):
-        return self.parent and self.parent.rightchild==self
-
-    def isroot(self):
-        # root node doesn't has a parent node
-        return not self.parent
-    def isleaf(self):
-        # the leafnode doesn't has any child node
-        return not self.leftchild and not self.rightchild
-    def hasanychild(self):
-        return self.rightchild or self.leftchild
-    def hasbothchild(self):
-        return self.rightchild&self.leftchild
-    def repalcenode(self,key,value,lc,rc):
-        self.key=key
-        self.value=value
-        self.leftchild=lc
-        self.rightchild=rc
-        # since it store the parent node information, so when the child node information changed, the parent information
-        # of the child node should also be updated
-        if self.hasleftchild():
-            self.leftchild.parent=self
-        if self.hasrightchild():
-            self.rightchild.parent=self
-
-    def findsuccessor(self):
-        '''
-        the node that follow the current node with inorder
-        if the node has rightchild, the successor is the minimum node of the right child subtree.
-        else: if this is the leftchild of the parent node, the successor is the parent node
-        else: the current node is the right child of the parent and has no right child, the successor is the successor of the parent node exclude itself
-
-        '''
-        succ = None
-        if self.hasrightchild():
-            succ = self.rightchild().findmin()
         else:
-            if self.parent:
-                if self.isleftchid():
-                    succ = self.parent
-                else:
-                    self.parent.rightchild = None  # set itself as none so that the parent find successor not include itself
-                    succ = self.parent.findsuccessor()  # recursive
-                    self.parent.rightchild = self
-        return succ
+            if current.hasrightchild():
+                self._put(key,val,current.rightchild)
+            else:
+                current.rightchild=Treenode(key,val,parent=current)
+                self.updatebalance(current.rightchild)
+    def updatebalance(self,node):
+        if node.balancefactor >1  or node.balancefactor<-1:
+            self.rebalance(node)  # if not balanced, need to be adjusted
+            return # and no longer run the rest of code
+        if node.parent !=None:  # change the balanced factor based on whether it is a left child or right child
+            if node.isleftchild():
+                node.parent.balancefactor+=1
+            elif node.isleftchild():
+                node.parent.balancefactor-=1
+        if node.parent.balancefactor!=0:# recurrsion
+            self.updatebalance(node.parent)
 
-    def findmin(self):
-        current = self  # find out the leftest child: the child don't have a left child
-        while current.hasleftchild():
-            current = current.leftchild
-        return current
-    def spliceof(self):# delete the current node
-        if self.isleaf():
-            if self.isleftchild():
-                self.parent.leftchild=None
-            else:
-                self.parent.rightchild=None
-        elif self.hasanychild():
-            if self.hasleftchild():
-                if self.isleftchild():
-                    self.parent.leftchild=self.leftchild
-                else:
-                    self.parent.rightchild=self.leftchild
-                self.leftchild.parent=self.parent
-            else:
-                if self.isleftchild():
-                    self.parent.leftchild=self.rightchild
-                else:
-                    self.parent.rightchild=self.rightchild
-                self.rightchild.parent=self.parent
+    '''left rotation: seteps 1: change the right child to be the root of the subtree, exchange the root and the rightchild'
+    ''''steps 2:the old root become the left child of the new root aka. the right child'''
+    '''steps 3:if the new root has a left child, that child would be the old root's right child, since the 
+     new root is the right child of the old root originally, so right now the old root must don't have a right child'''
+
+
+
+
+
+
 
 
 
