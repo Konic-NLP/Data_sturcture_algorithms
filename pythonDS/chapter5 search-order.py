@@ -150,6 +150,14 @@ the first round: compare n-1 times. since only if n-1 has been comparison, the l
 time complexity: O(N^2)
 
 '''
+def bubble_sort2(L):
+    '''普通冒泡排序，外层控制循环次数，内层循环遍历元素'''
+    n=len(L)
+    for i in range(n-1):
+        for j in range(n-1-i):
+            if L[i]>L[i+1]:
+                L[i],L[i+1]=L[i+1],L[i]
+    return L
 
 
 def bubble_sort(alist):
@@ -169,10 +177,11 @@ def bubble_sort(alist):
 def short_bubble_sort(alist):
     round= len(alist)-1
     stop = False
-    while round >0 and not stop:
-        
-                      # first round:n-1, second round: n-2, ........
-        print('outer loop '+str(compare))
+    # while round >0 and not stop:
+    for compare in range(len(alist)-1,0,-1):  # first round:n-1, second round: n-2, ........
+        # print('outer loop '+str(compare))
+    # first round:n-1, second round: n-2, ........
+
         stop = True # presupposed each round set there no need to compare anymore, and terminate the outer loop
         for num in range(compare):
             # the maximum index would be less than 1 of elements in the round to avoid the out of index
@@ -222,28 +231,70 @@ def select_sort(arr):
 
     return arr
 
-    '''
-    insert sort,
-    any elements before the current that wait for sorting is ordered, the elements just iterate all the elements,
-    if the current element is less than the compared element, then swap the element, else, the current position is the 
-    current elemnt should be 
-    '''
 
 
-    '''
-    shell sort, the optimized edition of the insert sort, first, split the elements into several subgroup based on the step
-    then execute the insert sort within each sub group, and in the end, just execute one round insert sort.
-    Since some elements has been ordered within the subgroup, so the overall efficient is better than the insert sort
-    '''
+'''
+insert sort,
+any elements before the current that wait for sorting is ordered, the elements just iterate all the elements,
+if the current element is less than the compared element, then swap the element, else, the current position is the 
+current elemnt should be 
+'''
+
+def insert_sort(arr):
+   '''插入排序'''
+   for i in range(1, len(arr)):
+       current = arr[i]  # 当前需要排序的元素
+       pre = i - 1  # 与之前的每个元素相比较
+       while pre >= 0 and arr[pre] > current:
+           arr[pre + 1], arr[pre] = arr[pre], arr[pre + 1]  # 如果前一个数大于自己，则交换两个数的位置
+           pre -= 1
+   return arr
+
+
+def insert_sort2(arr):
+    pass
 
 
 
-    '''
-    quick sort,
-    just select one element as the base, all the element that less than the base would be on the left and all element greater
-    than the element on the right, and rucursive  
-    
-    '''
+def merge_sort(arr):
+    if len(arr)==1:
+        return arr
+    mid=len(arr)//2
+    left=merge_sort(arr[:mid])
+    right=merge_sort(arr[mid:])
+
+    return merge(left,right)
+'''
+shell sort, the optimized edition of the insert sort, first, split the elements into several subgroup based on the step
+then execute the insert sort within each sub group, and in the end, just execute one round insert sort.
+Since some elements has been ordered within the subgroup, so the overall efficient is better than the insert sort
+'''
+def shell_sort(arr):
+    '''希尔排序'''
+    gap=len(arr)//2  #进行分组，按间隔取数
+    while gap>0:
+        for i in range(gap,len(arr)):  #插入排序部分，每次找前一个间隔的数，如果比自己大就交换，不断遍历，直到交换到第一个间隔的数
+            while i-gap>=0 and arr[i]<arr[i-gap]:
+                arr[i],arr[i-gap]=arr[i-gap],arr[i]
+                i-=gap
+        gap//=2 #第二遍间隔分组
+    return arr
+
+
+'''
+quick sort,
+just select one element as the base, all the element that less than the base would be on the left and all element greater
+than the element on the right, and rucursive  
+'''
+def quicksort(arr):
+   if len(arr)<2:  #如果只有0个或者1个，返回本身
+       return arr
+   else:
+       st=arr[0]
+       smaller=[i for i  in arr[1:] if  i < st]#任选一个元素，作为标准，分成比它小的元素组成的数组和比它大的元素组成的数组
+       bigger=[i for i in arr[1:]if i > st]
+       return quicksort(smaller) +[st]+quicksort(bigger)  #对其余两组进行递归
+
 if __name__=='__main__':
     selection_sort([1,5,2,3,3,9,7])
     # testlist = [0, 1 ]

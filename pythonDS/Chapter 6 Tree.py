@@ -178,12 +178,14 @@ class BinarySearchTree:
     def __iter__(self):
         return self.root.__iter__()
     def put(self,key,val):
+        #judge whther the insert point is root or not first
         if self.root:
             self._put(key,val,self.root)
         else:
             self.root=Treenode(key,val)
         self.size+=1
-    # helper function
+    # helper function compare the value with child node and find out that the one is leaf node, insert new one,
+    # any insertion can only happen at the leaf node, so it never change the node
     def _put(self,key,val,current):
         if key <current.key:
             if current.hasleftchild():
@@ -207,6 +209,7 @@ class BinarySearchTree:
         else:
             return None
     def _get(self,key,current):
+        # cannot find until the leaf node; find out the key; find in the leftchild, find in the right child.
         if not current:
             return None
         elif current.key==key:
@@ -218,6 +221,7 @@ class BinarySearchTree:
     def __getitem__(self, item):
         self.get(item)
     def __contains__(self, item):
+        # only check whether the key in the tree, so don't need to return the value using get
         if self._get(item,self.root):
             return True
         else:
@@ -228,6 +232,9 @@ class BinarySearchTree:
     delete a key, first, locate the key
     '''
     def delete(self,key):
+        # consider two situations:  1. the tree just has one node, judge whether the key is the root, if so, delete,
+        #otherwise, return None;2. the tree has nodes more than one, use the get method to get the node and delete it
+        # think more, what's the result of deleting a node
         if self.size>1:
             node2remove= self._get(key,self.root)
             if node2remove:
@@ -248,12 +255,43 @@ class BinarySearchTree:
     2. the deleting node has one child nodes
     3.the deleting node has two child nodes.
     '''
+    def remove(self):
     #possible 1  the deleting node is a leaf node, just set its parent node's corresponding node as None
-    if current.isleaf():  # jutisfy if it is a leaf node
-        if current==curent.parent.leftchild:  # see if it is a leftchild of the parent node or rightchild
-            current.parent.leftchild=None
-        else:
-            current.parent.rightchild=None
+        if current.isleaf():  # jutisfy if it is a leaf node
+            if current==curent.parent.leftchild:  # see if it is a leftchild of the parent node or rightchild
+                current.parent.leftchild=None
+            else:
+                current.parent.rightchild=None
+    # possibility 2 the deleting node has one node, just judge that node is a left node or a right node
+    # since the one node has a parent and the child, it need to adjust after deletion
+    # the node can be the right child or left child of the parent, and the node can have left or right child, and the
+    #node can be root node(without parent node)
+
+    else:
+    # no matter what the right child or left child the current node is, all its subtree must bigger or less than the parent node
+    if currentnode.hasleftchild():
+        if currentnode.isleftchild():
+            currentnode.leftchild.parent=currentnode.parent
+            currentnode.parent.leftchild=currentnode.leftchild
+        elif:
+            currentnode.leftchild.parent = currentnode.parent
+            currentnode.parent.rightchild= currentnode.leftchild
+        else: #the current node is the root so that it has no parent node
+            currentnode.replacedata(currentnode.leftchild.key,currentnode.leftchild.val,currentnode.leftchild.leftchild,currentnode.leftchild.rightchild)
+    else:
+        # if the current node has only one node and that node is right node
+
+
+    # possible 3 the node has two nodes, and find out the proceeding node to replace the deleting node
+    elif currentnode.hasbothchild():
+    succ=currentnode.findsuccessor()  # find out the successor
+    succ.spliceout()                     # delete the successor
+
+    currentnode.key=succ,key
+    currentnode.val=succ.val   # substitute the deleting node
+
+
+
 
 
 
@@ -297,6 +335,55 @@ class Treenode:
             self.leftchild.parent=self
         if self.hasrightchild():
             self.rightchild.parent=self
+
+    def findsuccessor(self):
+        '''
+        the node that follow the current node with inorder
+        if the node has rightchild, the successor is the minimum node of the right child subtree.
+        else: if this is the leftchild of the parent node, the successor is the parent node
+        else: the current node is the right child of the parent and has no right child, the successor is the successor of the parent node exclude itself
+
+        '''
+        succ = None
+        if self.hasrightchild():
+            succ = self.rightchild().findmin()
+        else:
+            if self.parent:
+                if self.isleftchid():
+                    succ = self.parent
+                else:
+                    self.parent.rightchild = None  # set itself as none so that the parent find successor not include itself
+                    succ = self.parent.findsuccessor()  # recursive
+                    self.parent.rightchild = self
+        return succ
+
+    def findmin(self):
+        current = self  # find out the leftest child: the child don't have a left child
+        while current.hasleftchild():
+            current = current.leftchild
+        return current
+    def spliceof(self):# delete the current node
+        if self.isleaf():
+            if self.isleftchild():
+                self.parent.leftchild=None
+            else:
+                self.parent.rightchild=None
+        elif self.hasanychild():
+            if self.hasleftchild():
+                if self.isleftchild():
+                    self.parent.leftchild=self.leftchild
+                else:
+                    self.parent.rightchild=self.leftchild
+                self.leftchild.parent=self.parent
+            else:
+                if self.isleftchild():
+                    self.parent.leftchild=self.rightchild
+                else:
+                    self.parent.rightchild=self.rightchild
+                self.rightchild.parent=self.parent
+
+
+
 
 
 
