@@ -49,3 +49,38 @@ class Graph:
 
 
 '''Breadth First Search, BFS'''
+
+# Word ladder: any words that there exits just one char between them, they can be connected
+
+def buildgraph(wordfile):
+    d={}
+    g=Graph()
+    for line in wordfile:
+        word=line
+        for i in range(len(word)):
+            bucket=word[:i]+'-'+word[i+1:]
+            d.get(bucket,[]).append(word)
+    for k,v in d.items():
+        for word1 in v:
+            for word2 in v:
+                if word1!= word2:
+                    g.addEdge(word1,word2)
+    return g
+
+
+words=['fool','pool','pole','poll','pale','sale','sage']
+def bfs(g:Graph,start):
+    start.setdistance(0)
+    start.setpred(None)
+    queue=[]
+    while queue:
+        current=queue.pop()
+        for nbr in current.getConnections():
+            if nbr.getcolor() =='white':  #unvisited
+                nbr.setcolor('gray')     # first visited
+                nbr.setdistance(current.getdistance()+1)
+                nbr.setpred(current)
+                queue.insert(0,nbr)
+        current.setcolor('black') # all the connections has been visited
+
+
