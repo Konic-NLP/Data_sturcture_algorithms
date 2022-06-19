@@ -425,8 +425,59 @@ class AVL(BinarySearchTree):# inherited from binary search tree and overriden th
 
     '''left rotation: seteps 1: change the right child to be the root of the subtree, exchange the root and the rightchild'
     ''''steps 2:the old root become the left child of the new root aka. the right child'''
-    '''steps 3:if the new root has a left child, that child would be the old root's right child, since the 
-     new root is the right child of the old root originally, so right now the old root must don't have a right child'''
+    '''right rotation: the left child of the root become the new root; old root become the right child of the new root; the right child of
+    the new root become the left child of the old root(the original position of the new root)'''
+    def rotateleft(self,root:Treenode):
+        newroot=root.rightchild()
+        '''change the root, the child of each one, and the parent of the each one '''
+        root.rightchild= newroot.leftchild
+        if newroot.leftchild:
+            newroot.leftchild.parent=root
+        newroot.parent=root.parent
+        if root.isroot():
+            self.root=root
+        else:
+            if root.isleftchild():
+                root.parent.leftchild=newroot
+            else:
+                root.parent.rightchild=newroot
+        newroot.leftchild=root
+        root.parent=newroot
+        root.balancefactor=root.balancefactor + 1 - min(newroot.balancefactor, 0)
+        newroot.balancefactor= newroot.balancefactor + 1 + max(root.balancefactor, 0)
+    def rotateright(self, root:Treenode):
+        newroot = root.leftchild()
+        '''change the root, the child of each one, and the parent of the each one '''
+        root.leftchild = newroot.rightchild
+        if newroot.rightchild:
+            newroot.rightchild.parent = root
+        newroot.parent = root.parent
+        if root.isroot():
+            self.root = root
+        else:
+            if root.isleftchild():
+                root.parent.leftchild = newroot
+            else:
+                root.parent.rightchild = newroot
+        newroot.rightchild = root
+        root.parent = newroot
+        root.balancefactor = root.balancefactor + 1 - min(newroot.balancefactor, 0)
+        newroot.balancefactor = newroot.balancefactor + 1 + max(root.balancefactor, 0)
+        '''some constraints: if one tree left rotate,check the right child, if right child is left inclne,right rotate the right child;
+        and then left rotate the tree'''
+        '''if one tree need to right rotate, check the left child, if the left child need right incline , left rotate the left subtree and 
+        right rotate the root'''
+    def rebalance(self,node):
+        if node.balancedfactor<0:
+            if node.rightchild.balancedfactor>0:
+                self.rotateright(node.rightchild)
+            self.rotateleft(node)
+        elif node.balancefactor>0:
+            if node.leftchild.balancedfactor<0:
+                self.rotateleft(node.leftchild)
+            self.rotateright(node)
+
+
 
 
 
