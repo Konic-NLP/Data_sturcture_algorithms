@@ -485,12 +485,6 @@ class AVL(BinarySearchTree):# inherited from binary search tree and overriden th
 
 
 
-
-
-
-
-
-
 def preorder(tree):
     if tree:
         print(tree.val)

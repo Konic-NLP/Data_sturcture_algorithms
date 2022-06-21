@@ -85,7 +85,7 @@ def convertbase(numbers,base):
         str=str+digits[s.pop()]
     return str
 
-print(convertbase(100, 7))
+
 
 '''
 前中后序表达式的转换
@@ -257,9 +257,7 @@ def newprinttask():
     else:
         return False  
     
-for i in range(10):
-    simulation(3600,5 )
-    
+
     
 
 '''
@@ -511,4 +509,6 @@ class OrderedList(unorderlist):  #O(n)
             new.setnext(current)
             
             
-            
+
+if __name__=='__main__':
+    print(convertbase(100,2))
