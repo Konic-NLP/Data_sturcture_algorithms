@@ -152,12 +152,70 @@ class binaryheap:
             if self.heaplist[i]< self.heaplist[i//2]:
                 self.heaplist[i],self.heaplist[i//2]=self.heaplist[i//2],self.heaplist[i]
             i=i//2
+    def build_heap(self,alist):
+        self.size=len(alist)
+        #for tree
+        self.heaplist= [0]+ alist[:]
+        # for graph:
+        # self.heaplist = [(0, 0)]
+        # for i in alist:
+        #     self.heaplist.append(i)
+        # all the nodes that bigger than the middle one should be the leaf node, since the leftchild of the mid one is
+        # 2*mid, which is bigger than the length of the list, so it means that from the
+        i= len(alist)//2
+        while (i>0):
+            self.percdown(i)
+            i-=1
+    def isEmpty(self):
+        return self.size==0
+
+    def percdown(self, i):
+        '''
+        get the minimum one of child nodes(since the parent node should less than the both child nodes, so the minimum
+        should be the candidate), compare the value, if less than the child node, exchange the value, until the one not less that one
+        '''
+        while i *2<=self.size:
+            mc=self.minchild(i)  # get the minimum direct child
+            if self.heaplist[i]<self.heaplist[mc]:
+                self.heaplist[i],self.heaplist[mc]=self.heaplist[mc],self.heaplist[i]
+            i=mc
+
+    '''
+    delete the node= delete the root,
+    copy the last element to the first one,
+    delete the redundant one at the end,
+    percdown from the first one
+    '''
+    def delMin(self):
+        min_=self.heaplist[1]
+        self.heaplist[1]=self.heaplist[self.size]
+        self.size-=1
+        self.heaplist.pop()
+        self.percdown(1)
+        return min_
 
 
 
 
 
 
+
+
+
+    def __contains__(self, item):
+        for i in self.heaplist:
+            if i[1]==item:
+                return True
+        return False
+
+    def minchild(self, i):
+        if i *2 +1 >self.size:
+            return i*2
+        else:
+            if self.heaplist[i*2]<self.heaplist[i*2+1]:
+                return i*2
+            else:
+                return i*2+1
 
 
 '''

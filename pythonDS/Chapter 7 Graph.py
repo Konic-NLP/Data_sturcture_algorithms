@@ -213,3 +213,108 @@ class DFSGraph(Graph):
         vertex.setcolor('black')
         self.time+=1
         vertex.setfinish(self.time)
+
+'''Dijkstra implementation'''
+'''
+put all the nodes into the priority queue, and each time return the minimum.
+
+iterate all the neighbors, if the path go through by the current node than the distance of the neighbors
+
+update the distance, set the precessor as the current node. O((V+E)logV), which is similar to BFS
+
+cannot process the situation that the weight is negative and you have to know the whole graph
+
+
+'''
+pq=__import__('Chapter 6 Tree')
+class PriorityQueue(pq):
+    def __init__(self):
+        self.heaplist=[(0,0)]
+        self.size=0
+    def percdown(self,i):
+        while i * 2 <= self.size:
+            mc = self.minchild(i)  # get the minimum direct child
+            if self.heaplist[i][0] < self.heaplist[mc][0]:
+                self.heaplist[i], self.heaplist[mc] = self.heaplist[mc], self.heaplist[i]
+            i = mc
+    def percup(self,i):
+        while i // 2 > 0:
+            # if the child node less than the parent node of that, they should change
+            if self.heaplist[i][0] < self.heaplist[i // 2][0]:
+                self.heaplist[i], self.heaplist[i // 2] = self.heaplist[i // 2], self.heaplist[i]
+            i = i // 2
+    def minchild(self,i):
+        if i * 2 + 1 > self.size:
+            return i * 2
+        else:
+            if self.heaplist[i * 2][0] < self.heaplist[i * 2 + 1][0]:
+                return i * 2
+            else:
+                return i * 2 + 1
+    def delMin(self):
+        min_ = self.heaplist[1][1]
+        self.heaplist[1] = self.heaplist[self.size]
+        self.size -= 1
+        self.heaplist.pop()
+        self.percdown(1)
+        return min_
+    def decreasekey(self,value,amt):
+        '''find the specific element and change the data of that element, then percup, adjust the location of the heap'''
+        done=False
+        i=1
+        mykey=0
+        while not done and i<=self.size:
+            if self.heaplist[i][1]==value:
+                done=True
+                mykey=i
+            else:
+                i+=1
+        if mykey>0:
+            self.heaplist[mykey]=(amt,self.heaplist[mykey][1])
+            super().percup(mykey)
+    def build_heap(self,alist):
+        self.size=len(alist)
+        #for tree
+        #self.heaplist= [0]+ alist[:]
+        # for graph:
+        self.heaplist = [(0, 0)]
+        for i in alist:
+            self.heaplist.append(i)
+        # all the nodes that bigger than the middle one should be the leaf node, since the leftchild of the mid one is
+        # 2*mid, which is bigger than the length of the list, so it means that from the
+        i= len(alist)//2
+        while (i>0):
+            self.percdown(i)
+            i-=1
+def Dijkstra(aGraph:Graph,start):
+    pq=PriorityQueue()
+    start.setdistance(0)
+    pq.build_heap([(v.getdistance(),v)for v in aGraph])
+    while not pq.isempty():
+        current=pq.delMin()# get the minimum from the heap
+        for neighbor in current.getConnections(): # get all neighbors
+            newdist=current.getdistance()+current.getweight(neighbor) # get the distance when the path through the current
+            if newdist<neighbor.getdistance(): # compare the value
+                neighbor.setdistance(newdist) # update the distance
+
+                neighbor.setpred(current)# set the predcessor to track
+                pq.decrease(neighbor,newdist)  # rearrange the location of the neighbor in the pq
+
+
+'''Prime'''
+'''each time select a safe edge that the other node not in the tree add to the tree'''
+def Prim(G:Graph,start):
+    pq=PriorityQueue()
+    for v in G:
+        v.setdistance(float('inf'))
+        v.setpred(None)
+    start.setdistance(0)
+    pq.build_heap([(v.getdistance(),v) for v in G])
+    while not pq.isempty():
+        current=pq.delMin()  # only now add the node to the tree
+        for neighbor in current.getConnections():
+            newcost=current.getweight(neighbor)
+            if neighbor in pq and newcost <neighbor.getdistance():
+                neighbor.setpred(current)
+                neighbor.setdistance(newcost)
+                pq.decreasekey(neighbor,newcost)
