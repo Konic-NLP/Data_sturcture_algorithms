@@ -227,7 +227,7 @@ cannot process the situation that the weight is negative and you have to know th
 
 '''
 pq=__import__('Chapter 6 Tree')
-class PriorityQueue(pq):
+class PriorityQueue(pq.binaryheap):
     def __init__(self):
         self.heaplist=[(0,0)]
         self.size=0
