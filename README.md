@@ -6,6 +6,8 @@ This is personal practice and learning on data structure and algorithms implemen
 
 The reference book is <*Problems Solving with Algorithms and Data Structures Using Python(Second Edition)*>.
 
+[My handwritting notes in Chinese(PDF) writing in Goodnotes on IPAD](https://github.com/Konic-NLP/Data_sturcture_algorithms/blob/main/Data%20Structure%20and%20algorithms_7.pdf)
+
 [Chapter 1: Euclid's method to get the greatest common divisor; compare the fraction and logistic gate](https://github.com/Konic-NLP/Data_sturcture_algorithms/blob/main/pythonDS/chap1.py)  
 [Chapter 2: basic data structures: list and dictionary](https://github.com/Konic-NLP/Data_sturcture_algorithms/blob/main/pythonDS/Chapter%202%20List%26Dict.py)
 - detect the two strings has different order but same chars 
