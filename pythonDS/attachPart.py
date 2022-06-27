@@ -1,6 +1,9 @@
 # 1. List, consecutive memory block
 ''' once the list is filled, just assign a bigger one and copy all the elements in the original list to the bigger new one'''
 import random
+import sys
+
+from PIL import Image
 
 '''the analysis of performance:
 index, set value :O(1)
@@ -311,6 +314,31 @@ class skiplist:
                     temp.setnext(nextlevel.getnext())
                     nextlevel.setnext(temp)
                     top=temp
+class Map:
+    '''implement map using skip list'''
+    # search/insert O(logn)
+    def __init__(self):
+        self.collection=skiplist()
+    def put(self,key,value):
+        self.collection.insert(key,value)
+    def get(self,key):
+        self.collection.search(key)
+
+
+
+
+'''quantify the image, to reduce the data of an image'''
+def simplequant(jpgfile):
+    im=Image.open(jpgfile)
+    w,h=im.size
+    for row in range(h):
+        for col in range(w):
+            r,g,b= im.getpixel((col,row))
+            r=r//36*36
+            g=g// 42*42
+            b=b//42*42
+            im.putpixel((col,row),(r,g,b))
+    im.show()
 
 
 
@@ -319,11 +347,149 @@ class skiplist:
 
 
 
+def buildanddisplay(jpgfile):
+    im=Image.open(jpgfile)
+    w,h=im.size
+    ot=OctTree()
+    for row in range(h):
+        for col in range(w):
+            r,g,b = im.getpixel((col,row))
+            ot.insert(r,g,b)
+    ot.reduce(256)
+    for row in range(h):
+        for col in range(w):
+            r, g, b = im.getpixel((col, row))
+            nr,ng,nb=ot.find(r,g,b)
+            im.putpixel((col,row),(nr,ng,nb))
+    im.show()
+
+class OctTree:
+    def __init__(self):
+        self.root=None
+        self.maxlevel=5
+        self.numLeaves=0
+        self.leaflist=[]
+    def insert(self,r,g,b):
+        if not self.root:
+            self.root=self.otNode(outer=self)
+        self.root.insert(r,g,b,0,self)
+    def find(self,r,g,b):
+        if self.root:
+            return self.root.find(r,g,b,0)
+    def reduce(self,maxcubes):
+        while len(self.leaflist) > maxcubes:
+            smallest=self.findmin()
+            smallest.parent.merge()
+            self.leaflist.append(smallest.parent)
+            self.numLeaves+=1
+    def findmin(self):
+        mincount=float('inf')
+        maxlev=0
+        mincube=None
+        for i in self.leaflist:
+            if i.count <= mincount and i.level >=maxlev:
+                mincube=i
+                mincount=i.count
+                maxlev=i.level
+        return mincube
+    class otNode: # inner class
+        def __init__(self,parent=None,level=0,outer=None):
+            self.red=0
+            self.green=0
+            self.blue=0
+            self.count=0
+            self.parent=parent
+            self.level=level
+            self.oTree=outer
+            self.children=[None]*8
+
+        def insert(self,r,g,b,level,outer):
+            if level < self.oTree.maxlevel:
+                idx=self.computerIndex(r,g,b,level)
+                if self.children[idx]==None:
+                    self.children[idx]=outer.otNode(parent=self, level=level+1,outer=outer)
+                self.children[idx].insert(r,g,b,level+1,outer)
+            else:
+                if self.count==0:
+                    self.oTree.numLeaves=self.oTree.numLeaves+1
+                    self.red+=r
+                    self.green+=g
+                    self.blue+=b
+                    self.count+=1
+        def computerIndex(self,r,g,b,level):
+            shift=8-level
+            rc=r>>shift-2 &0x4
+            gc=g>>shift-1 &0x2
+            bc= b>>shift&0x1
+            return (rc| gc| bc)
+        def find(self,r,g,b,level):
+            if level <self.oTree.maxlevel:
+                idx=self.computerIndex(r,g,b,level)
+                if self.children[idx]:
+                    return self.children[idx].find(r, g, b, level +1)
+                elif self.count>0:
+                    return ((self.red //self.count,self.green//self.count,self.blue//self.count))
+                else:
+                    print('error: No leaf node for this color')
+            else:
+                return ((self.red //self.count,self.green//self.count,self.blue//self.count))
+
+        def merge(self):
+            for i in self.children:
+                if i:
+                    if i.count>0:
+                        self.oTree.leaflist.remove(i)
+                        self.oTree.numleaves-=1
+                    else:
+                        print('recursively merging non-leaf ...')
+                        i.merge()
+                    self.count+=i.count
+                    self.red+=i.red
+                    self.green+=i.green
+                    self.blue+= i.blue
+            for i in range(8):
+                self.children[i] = None
 
 
+
+def simplematcher(pattern,text):   # O(nm)
+    start=0  # start point to match
+    i=0  # the index of the text
+    j=0  # the index of the pattern
+    stop=False
+    match=False
+    while not match and not stop:
+        if text[i]==pattern[j]:  # if match, compare the next one
+            i+=1
+            j+=1
+        else:
+            start+=1  # if not match, move the start point to the next one, and restart compare
+            i=start
+            j=0
+        if j==len(pattern):
+            match=True  #each token in the pattern are matched
+        else:
+            if i ==len(text):  #all kinds of text has been compared
+                stop=True
+        if match:
+            return i-j   # i= the end index of the matched text
+                        # j= the length of the patten,   i-j =start
+        else:
+            return -1
+def  mismatchlinks(pattern):
+    augpattern='0'+pattern
+    links={}
+    links[1]=0
+    for k in range(2,len(augpattern)):
+        s=links[k-1]
+        stop=False
+        while s>=1 and not stop:
+            if augpattern[s]==augpattern[k-1]:
+                stop=True
+            else:
+                s=links[s]
+        links[s]=s+1
+    return links
 
 if __name__ == '__main__':
-    print(encrypt('uryybjbeyq'))
-    print(encrypt('helloworld'))
-    s = encrypt_k('helloworld', 11)
-    print(decrypt(s, 11))
+    buildanddisplay(r'D://ge.jpg')
